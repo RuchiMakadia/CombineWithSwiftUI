@@ -18,19 +18,19 @@ class Model: ObservableObject {
     @Published var post_data = [Post]()
     @Published var error_message: String?
     
-    private var searchCancellable: Cancellable? {
+    private var publisher_for_request: Cancellable? {
         didSet { oldValue?.cancel() }
     }
     deinit {
-        searchCancellable?.cancel()
+        publisher_for_request?.cancel()
     }
     
-   func fetch_post_data(forurl url: URL) -> AnyPublisher<[Post], enum_error_type> {
+    func fetch_post_data(forurl url: URL) -> AnyPublisher<[Post], enum_error_type> {
         return web_request(with: url)
     }
     
     func get_post_data(url: URL) {
-    searchCancellable = fetch_post_data(forurl: url)
+    publisher_for_request = fetch_post_data(forurl: url)
         .receive(on: DispatchQueue.main)
         .sink(
           receiveCompletion: { [weak self] value in
@@ -41,8 +41,8 @@ class Model: ObservableObject {
               break
             }
           },
-          receiveValue: { [weak self] forecast in
-            self?.post_data = forecast
+          receiveValue: { [weak self] post in
+            self?.post_data = post
         })
     }
 }

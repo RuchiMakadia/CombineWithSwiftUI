@@ -15,8 +15,8 @@ func web_request<T>(with url: URL) -> AnyPublisher<[T],enum_error_type> where T:
     .mapError { error in
             enum_error_type.network(description: error.localizedDescription)
     }
-    .flatMap(maxPublishers: .max(1)) { pair in
-        decode(pair.data)
+    .flatMap(maxPublishers: .max(1)) { post in
+        decode(post.data)
     }
     .eraseToAnyPublisher()
 }
